@@ -22,6 +22,7 @@ namespace GitAspx.Lib {
 	using System;
 	using System.Configuration;
 	using System.IO;
+	using System.Web.Hosting;
 
 	public class AppSettings {
 		public DirectoryInfo RepositoriesDirectory { get; set; }
@@ -36,7 +37,12 @@ namespace GitAspx.Lib {
 			if (string.IsNullOrEmpty(path)) {
 				throw new InvalidOperationException("The 'Repositories' AppSetting has not been initialised.");
 			}
-
+			if(path.StartsWith("~")) {
+				path = HostingEnvironment.MapPath(path);
+				if(path==null) {
+					throw new ArgumentException("Virtual path '{0}' could not be mapped".With(path));
+				}
+			}
 			if (!Directory.Exists(path)) {
 				throw new DirectoryNotFoundException(
 					string.Format("Could not find the directory '{0}' which is configured as the directory of repositories.", path));
