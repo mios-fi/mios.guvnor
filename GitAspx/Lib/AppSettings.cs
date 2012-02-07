@@ -28,6 +28,8 @@ namespace GitAspx.Lib {
 		public DirectoryInfo RepositoriesDirectory { get; set; }
 		public bool UploadPack { get; set; }
 		public bool ReceivePack { get; set; }
+		public bool RunHooksSilently { get; set; }
+		public TimeSpan HookTimeout { get; set; }
 
 		public static AppSettings FromAppConfig() {
 			var settings = new AppSettings();
@@ -63,6 +65,21 @@ namespace GitAspx.Lib {
 
 			if (!string.IsNullOrEmpty(receivePackRaw) && bool.TryParse(receivePackRaw, out receivePack)) {
 				settings.ReceivePack = receivePack;
+			}
+
+			var runHooksSilentlyRaw = ConfigurationManager.AppSettings["runHooksSilently"];
+			var hookTimeoutRaw = ConfigurationManager.AppSettings["hookTimeout"];
+
+			bool runHooksSilently;
+			TimeSpan hookTimeout;
+
+			if(!string.IsNullOrEmpty(runHooksSilentlyRaw) && bool.TryParse(runHooksSilentlyRaw, out runHooksSilently)) {
+				settings.RunHooksSilently = runHooksSilently;
+			}
+			if(!string.IsNullOrEmpty(hookTimeoutRaw) && TimeSpan.TryParse(hookTimeoutRaw, out hookTimeout)) {
+				settings.HookTimeout = hookTimeout;
+			} else {
+				settings.HookTimeout = TimeSpan.FromMinutes(10);
 			}
 
 			return settings;

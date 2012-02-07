@@ -1,7 +1,6 @@
 namespace GitAspx.Lib {
 	using System;
 	using System.Collections.Generic;
-	using System.Diagnostics;
 	using System.IO;
 	using System.Linq;
 	using System.Text;
@@ -40,6 +39,7 @@ namespace GitAspx.Lib {
 		public void Receive(Stream inputStream, Stream outputStream) {
 			using (var repository = GetRepository()) {
 				var pack = new ReceivePack(repository);
+				pack.setPostReceiveHook(new PostReceiveFileHook(FullPath));
 				pack.setBiDirectionalPipe(false);
 				pack.receive(inputStream, outputStream, outputStream);
 			}
@@ -129,33 +129,6 @@ namespace GitAspx.Lib {
 			}
 
 			return packDir.GetFiles("*.pack").Select(x => x.Name).ToList();
-		}
-
-		public void ExecuteHooks(string type) {
-			var hooksDirectory = new DirectoryInfo(Path.Combine(FullPath, "hooks"));
-			if(!hooksDirectory.Exists) return;
-			foreach(var hook in hooksDirectory.GetFiles(type+"*")) {
-				if(hook.FullName.EndsWith(".sample")) return;
-				var processStartInfo = new ProcessStartInfo {
-					FileName = hook.FullName, UseShellExecute = false,
-					WindowStyle = ProcessWindowStyle.Hidden, CreateNoWindow = true,
-					RedirectStandardOutput = true, RedirectStandardError = true,
-					WorkingDirectory = FullPath
-				};
-				try {
-					Debug.WriteLine("Running hook {0}".With(hook.FullName));
-					using(var process = Process.Start(processStartInfo)) {
-						process.WaitForExit((int) TimeSpan.FromMinutes(1).TotalMilliseconds);
-						process.WaitForExit();
-						Debug.WriteLine("STDOUT: " + process.StandardOutput.ReadToEnd());
-						Debug.WriteLine("STDERR: " + process.StandardError.ReadToEnd());
-						process.Close();
-						Debug.WriteLine("Done.");
-					}
-				} catch(Exception e) {
-					Debug.WriteLine(e);
-				}
-			}
 		}
 	}
 

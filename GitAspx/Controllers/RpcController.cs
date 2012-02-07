@@ -46,7 +46,6 @@ namespace GitAspx.Controllers {
 		public ActionResult ReceivePack(string project) {
 			return ExecuteRpc(project, "receive-pack", repository => {
 				repository.Receive(GetInputStream(), Response.OutputStream);
-				repository.ExecuteHooks("post-receive");
 			});
 		}
 
