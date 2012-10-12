@@ -1,0 +1,20 @@
+﻿@model Guvnor.Controllers.ProjectsController.IndexModel
+@using Guvnor
+<h1>Projects</h1>		
+<ul>
+	@foreach (var project in Model.Projects) {
+		<li>
+			<p>
+				<strong>@Html.ActionLink(project.Name,"Item",new { project = project.Name })</strong>
+				<span>(@Url.ProjectUrl(project.Name))</span>
+			</p>
+			@if(project.Commit!=null) {
+				<blockquote>
+					<strong>@project.Commit.Id.Substring(0,7)</strong>
+					<em>@project.Commit.Date</em> 
+					@project.Commit.Message
+				</blockquote>
+			}
+		</li>
+	}
+</ul>

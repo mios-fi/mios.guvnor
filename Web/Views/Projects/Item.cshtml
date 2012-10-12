@@ -1,0 +1,11 @@
+﻿@model Guvnor.Controllers.ProjectsController.ItemModel 
+<h1>Project @Model.Name</h1>
+<table>
+	@foreach(var c in Model.Commits) {
+		<tr>
+			<td><strong>@c.Id.Substring(0,8)</strong></td>
+			<td>@c.Message</td>
+			<td><em>@c.Date.ToString("g")</em></td>
+		</tr>
+	}
+</table>
